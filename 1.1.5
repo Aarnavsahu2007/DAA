@@ -1,0 +1,81 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_ELEMENTS 100
+#define MAX_SUBSETS 10000
+
+// Global arrays to store discovered subsets and their sizes
+int discovered_subsets[MAX_SUBSETS][MAX_ELEMENTS];
+int subset_sizes[MAX_SUBSETS];
+int subset_count = 0;
+
+// Temporary array to hold the current subset being evaluated
+int current_subset[MAX_ELEMENTS];
+int current_size = 0;
+
+// Backtracking function to find all subsets
+void find_subsets(int* elements, int n, int target, int index, int current_sum) {
+    // Base Case: If we have processed all elements
+    if (index == n) {
+        if (current_sum == target) {
+            // Save the discovered subset
+            for (int i = 0; i < current_size; i++) {
+                discovered_subsets[subset_count][i] = current_subset[i];
+            }
+            subset_sizes[subset_count] = current_size;
+            subset_count++;
+        }
+        return;
+    }
+
+    // Choice 1: Include the current element in the subset
+    current_subset[current_size] = elements[index];
+    current_size++;
+    find_subsets(elements, n, target, index + 1, current_sum + elements[index]);
+    
+    // Backtrack: Remove the element to try the next choice
+    current_size--;
+
+    // Choice 2: Exclude the current element from the subset
+    find_subsets(elements, n, target, index + 1, current_sum);
+}
+
+int main() {
+    int n;
+    if (scanf("%d", &n) != 1) return 0;
+
+    int* elements = (int*)malloc(n * sizeof(int));
+    for (int i = 0; i < n; i++) {
+        if (scanf("%d", &elements[i]) != 1) {
+            free(elements);
+            return 0;
+        }
+    }
+
+    int target_sum;
+    if (scanf("%d", &target_sum) != 1) {
+        free(elements);
+        return 0;
+    }
+
+    // Start backtracking from index 0 with a current sum of 0
+    find_subsets(elements, n, target_sum, 0, 0);
+
+    // Output results
+    if (subset_count == 0) {
+        printf("-1\n");
+    } else {
+        // Print the subsets in reverse order of discovery
+        for (int i = subset_count - 1; i >= 0; i--) {
+            for (int j = 0; j < subset_sizes[i]; j++) {
+                // Every number is strictly followed by a space to match the expected format
+                printf("%d ", discovered_subsets[i][j]);
+            }
+            printf("\n");
+        }
+    }
+
+    free(elements);
+    return 0;
+}
+  
