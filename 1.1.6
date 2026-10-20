@@ -1,0 +1,108 @@
+#include <limits.h> 
+#include <stdio.h>
+#define MAX 20
+int V, E;
+int graph[MAX][MAX];
+#define INFINITY 99999
+
+void dijkstra(int G[MAX][MAX], int n, int startnode) {
+	
+
+    int distance[MAX], pred[MAX], visited[MAX];
+    int i, j, count, mindistance, nextnode;
+
+    // Initialize distance, pred, and visited arrays
+    for (i = 1; i <= n; i++) {
+        distance[i] = INFINITY;
+        pred[i] = -1;
+        visited[i] = 0;
+    }
+
+    distance[startnode] = 0;
+
+    // Find the shortest path for all vertices
+    for (count = 1; count <= n; count++) {
+        mindistance = INFINITY;
+        nextnode = -1;
+
+        // Choose the minimum distance vertex from the set of unvisited vertices
+        for (i = 1; i <= n; i++) {
+            if (!visited[i] && distance[i] < mindistance) {
+                mindistance = distance[i];
+                nextnode = i;
+            }
+        }
+
+        // If no remaining vertex is reachable, break out early
+        if (nextnode == -1) {
+            break;
+        }
+
+        visited[nextnode] = 1;
+
+        // Update the distance values of the neighboring vertices
+        for (i = 1; i <= n; i++) {
+            if (!visited[i]) {
+                // If G[nextnode][i] is 0 and it's not a self-loop, treat it as infinity
+                int cost = (G[nextnode][i] == 0 && nextnode != i) ? INFINITY : G[nextnode][i];
+                if (cost != INFINITY && distance[nextnode] + cost < distance[i]) {
+                    distance[i] = distance[nextnode] + cost;
+                    pred[i] = nextnode;
+                }
+            }
+        }
+    }
+
+    // Print the header and result matrix matching the formatting requirements
+    printf("Node\tDistance\tPath\n");
+    for (i = 1; i <= n; i++) {
+        if (i != startnode) {
+            if (distance[i] >= INFINITY) {
+                printf("%4d\t%8s\tNO PATH\n", i, "INF");
+            } else {
+                printf("%4d\t%8d\t", i, distance[i]);
+                j = i;
+                printf("%d", j);
+                while (j != startnode) {
+                    j = pred[j];
+                    printf("<-%d", j);
+                }
+                printf("\n");
+            }
+        }
+    }
+
+  
+	
+}
+int main() { 
+	int s, d, w, i, j;
+	printf("Enter the number of vertices : ");
+	scanf("%d", &V);
+	printf("Enter the number of edges : ");
+	scanf("%d", &E);
+	for(i = 1 ; i <= V; i++) {
+		for(j = 1; j <= V; j++) {
+			graph[i][i] = 0;
+		}
+	}
+	for(i = 1; i <= E; i++) {
+		printf("Enter source : ");
+		scanf("%d", &s);
+		printf("Enter destination : ");
+		scanf("%d", &d);
+		printf("Enter weight : ");
+		scanf("%d", &w);
+		if(s > V || d > V || s <= 0 || d <= 0) {
+			printf("Invalid index. Try again.\n");
+			i--;
+			continue;
+		} else {
+			graph[s][d] = w;
+		}
+	}
+	printf("Enter the source :");
+	scanf("%d", &s);
+	dijkstra(graph, V, s); 
+	return 0; 
+} 
